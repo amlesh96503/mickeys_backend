@@ -1,0 +1,29 @@
+
+name: Deploy Laravel to MilesWeb
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect to MilesWeb and update code
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.MILESWEB_HOST }}
+          username: ${{ secrets.MILESWEB_USER }}
+          key: ${{ secrets.MILESWEB_SSH_KEY }}
+          port: ${{ secrets.MILESWEB_PORT }}
+          script: |
+            set -e
+            cd ~/mickey.dawebsolutions.com
+            git fetch origin main
+            git reset --hard origin/main
+            php artisan view:clear
+            php artisan config:clear
+            echo "Deployment completed successfully"
